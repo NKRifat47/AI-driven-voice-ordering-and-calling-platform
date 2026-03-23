@@ -27,7 +27,7 @@ app.use("/uploads", express.static("uploads"));
 
 // Health check
 app.get("/", (req, res) => {
-  res.send("Hello, World!");
+  res.send("Doctor AI backend is running");
 });
 
 // 404 handler (must be after routes)
