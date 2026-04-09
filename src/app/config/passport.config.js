@@ -13,7 +13,7 @@ passport.use(
     },
     async (email, password, done) => {
       try {
-        const user = await prisma.user.findUnique({
+        const user = await prisma.users.findUnique({
           where: { email },
         });
 
@@ -21,13 +21,13 @@ passport.use(
           return done(null, false, { message: "Incorrect email." });
         }
 
-        if (!user.passwordHash) {
+        if (!user.password) {
           return done(null, false, {
             message: "Please login with your social account.",
           });
         }
 
-        const isMatch = await bcrypt.compare(password, user.passwordHash);
+        const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
           return done(null, false, { message: "Incorrect password." });
@@ -57,22 +57,23 @@ passport.use(
     async (accessToken, refreshToken, profile, done) => {
       try {
         const email = profile.emails[0].value;
-        const name = profile.displayName;
+        const nameParts = profile.displayName.split(" ");
+        const first_name = nameParts[0];
+        const last_name = nameParts.slice(1).join(" ") || "";
         const avatarUrl = profile.photos[0]?.value;
 
-        let user = await prisma.user.findUnique({
+        let user = await prisma.users.findUnique({
           where: { email },
         });
 
         if (!user) {
-          user = await prisma.user.create({
+          user = await prisma.users.create({
             data: {
               email,
-              name,
-              avatarUrl,
-              isVerified: true,
-              oauthProvider: "google",
-              oauthProviderId: profile.id,
+              first_name,
+              last_name,
+              avatar: avatarUrl,
+              is_verified: true,
             },
           });
         }
@@ -92,7 +93,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
   try {
-    const user = await prisma.user.findUnique({ where: { id } });
+    const user = await prisma.users.findUnique({ where: { id } });
     done(null, user);
   } catch (err) {
     done(err, null);

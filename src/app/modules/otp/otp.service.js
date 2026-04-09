@@ -15,12 +15,13 @@ const generateOtp = (length = 6) =>
 export const OtpService = {
   // ✅ Send OTP
   sendOtp: async (prisma, email, name) => {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email },
       select: {
         id: true,
         isVerified: true,
-        name: true,
+        first_name: true,
+        last_name: true,
       },
     });
 
@@ -44,7 +45,7 @@ export const OtpService = {
       subject: "Verification OTP",
       templateName: "otp",
       templateData: {
-        name: name || user.name,
+        name: name || `${user.first_name} ${user.last_name}`,
         otp,
       },
     });
@@ -52,7 +53,7 @@ export const OtpService = {
 
   // ✅ Verify OTP
   verifyOtp: async (prisma, email, otp) => {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email },
       select: {
         id: true,
@@ -79,7 +80,7 @@ export const OtpService = {
       throw new DevBuildError("Invalid OTP", 401);
     }
 
-    await prisma.user.update({
+    await prisma.users.update({
       where: { email },
       data: { isVerified: true },
     });
@@ -88,7 +89,7 @@ export const OtpService = {
 
   // ✅ Send Forgot Password OTP
   sendForgotPasswordOtp: async (prisma, email) => {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email },
     });
 
@@ -112,7 +113,7 @@ export const OtpService = {
       subject: "Forgot Password OTP",
       templateName: "forgotPassword",
       templateData: {
-        name: user.name,
+        name: `${user.first_name} ${user.last_name}`,
         otp,
       },
     });
@@ -128,7 +129,7 @@ export const OtpService = {
     }
 
     // OTP is valid, generate a short-lived reset token
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email },
       select: { id: true, email: true, role: true },
     });
@@ -143,7 +144,7 @@ export const OtpService = {
       { expiresIn: "10m" },
     );
 
-    await prisma.user.update({
+    await prisma.users.update({
       where: { email },
       data: { forgotPasswordStatus: true },
     });

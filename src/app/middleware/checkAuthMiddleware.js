@@ -21,7 +21,7 @@ export const checkAuthMiddleware =
       const decoded = jwt.verify(jwtToken, envVars.JWT_SECRET_TOKEN);
 
       // Determine which table to search based on the role or route
-      const user = await prisma.user.findUnique({
+      const user = await prisma.users.findUnique({
         where: { id: decoded.id },
       });
 

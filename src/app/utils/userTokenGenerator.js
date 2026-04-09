@@ -38,7 +38,7 @@ export const createNewAccessTokenUsingRefreshToken = async (
     envVars.JWT_REFRESH_TOKEN,
   );
 
-  const isUser = await prisma.user.findUnique({
+  const isUser = await prisma.users.findUnique({
     where: { email: verifyRefreshToken.email },
   });
 
