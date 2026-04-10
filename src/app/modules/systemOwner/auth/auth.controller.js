@@ -20,10 +20,20 @@ const handleError = (res, error) => {
 const login = async (req, res) => {
   try {
     const result = await AuthService.login(prisma, req.body);
+    const { refreshToken, accessToken, user } = result;
+
+    // Store refresh token in httpOnly cookie (not accessible via JS)
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
     return res.status(StatusCodes.OK).json({
       success: true,
       message: "Login successful",
-      data: result,
+      data: { user, accessToken },
     });
   } catch (error) {
     return handleError(res, error);
@@ -95,10 +105,44 @@ const changePassword = async (req, res) => {
   }
 };
 
+const refreshAccessToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.cookies;
+    const result = await AuthService.refreshAccessToken(prisma, refreshToken);
+
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Access token refreshed successfully",
+      data: result,
+    });
+  } catch (error) {
+    return handleError(res, error);
+  }
+};
+
+const logout = async (req, res) => {
+  try {
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    return handleError(res, error);
+  }
+};
+
 export const AuthController = {
   login,
   sendForgotPasswordOtp,
   verifyForgotPasswordOtp,
   resetPassword,
   changePassword,
+  refreshAccessToken,
+  logout,
 };

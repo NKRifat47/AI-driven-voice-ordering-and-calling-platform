@@ -38,4 +38,12 @@ router.post(
   AuthController.changePassword,
 );
 
+router.post("/refresh-token", AuthController.refreshAccessToken);
+
+router.post(
+  "/logout",
+  checkAuthMiddleware("SYSTEM_OWNER"),
+  AuthController.logout,
+);
+
 export const AuthRouter = router;

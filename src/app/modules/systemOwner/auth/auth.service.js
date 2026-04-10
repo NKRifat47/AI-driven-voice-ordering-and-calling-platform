@@ -126,7 +126,9 @@ const verifyForgotPasswordOtp = async (prisma, email, otp) => {
   // Store token in Redis with same 2-min TTL
   // → invalidated immediately on use, OR auto-expired if unused
   const resetRedisKey = `${RESET_TOKEN_KEY_PREFIX}:${user.id}`;
-  await redisClient.set(resetRedisKey, resetToken, { EX: RESET_TOKEN_EXPIRATION });
+  await redisClient.set(resetRedisKey, resetToken, {
+    EX: RESET_TOKEN_EXPIRATION,
+  });
 
   return { resetToken };
 };
@@ -187,7 +189,10 @@ const changePassword = async (prisma, userId, currentPassword, newPassword) => {
 
   const isMatch = await bcrypt.compare(currentPassword, user.password);
   if (!isMatch) {
-    throw new DevBuildError("Current password is incorrect", StatusCodes.UNAUTHORIZED);
+    throw new DevBuildError(
+      "Current password is incorrect",
+      StatusCodes.UNAUTHORIZED,
+    );
   }
 
   const hashedPassword = await bcrypt.hash(newPassword, 12);
@@ -198,10 +203,52 @@ const changePassword = async (prisma, userId, currentPassword, newPassword) => {
   });
 };
 
+const refreshAccessToken = async (prisma, token) => {
+  if (!token) {
+    throw new DevBuildError(
+      "No refresh token provided. Please login again.",
+      StatusCodes.UNAUTHORIZED,
+    );
+  }
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, envVars.JWT_REFRESH_TOKEN);
+  } catch {
+    throw new DevBuildError(
+      "Refresh token is invalid or expired. Please login again.",
+      StatusCodes.UNAUTHORIZED,
+    );
+  }
+
+  const user = await prisma.users.findUnique({
+    where: { id: decoded.id },
+    select: { id: true, email: true, role: true, is_verified: true },
+  });
+
+  if (!user) {
+    throw new DevBuildError("User does not exist", StatusCodes.NOT_FOUND);
+  }
+
+  if (user.role !== "SYSTEM_OWNER") {
+    throw new DevBuildError("You are not authorized", StatusCodes.UNAUTHORIZED);
+  }
+
+  // Generate a fresh access token
+  const accessToken = jwt.sign(
+    { id: user.id, email: user.email, role: user.role },
+    envVars.JWT_SECRET_TOKEN,
+    { expiresIn: envVars.JWT_EXPIRES_IN },
+  );
+
+  return { accessToken };
+};
+
 export const AuthService = {
   login,
   sendForgotPasswordOtp,
   verifyForgotPasswordOtp,
   resetPassword,
   changePassword,
+  refreshAccessToken,
 };
