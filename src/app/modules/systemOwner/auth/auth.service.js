@@ -171,9 +171,37 @@ const resetPassword = async (prisma, userId, resetToken, newPassword) => {
   });
 };
 
+const changePassword = async (prisma, userId, currentPassword, newPassword) => {
+  const user = await prisma.users.findUnique({
+    where: { id: userId },
+    select: { id: true, role: true, password: true },
+  });
+
+  if (!user) {
+    throw new DevBuildError("User does not exist", StatusCodes.NOT_FOUND);
+  }
+
+  if (user.role !== "SYSTEM_OWNER") {
+    throw new DevBuildError("You are not authorized", StatusCodes.UNAUTHORIZED);
+  }
+
+  const isMatch = await bcrypt.compare(currentPassword, user.password);
+  if (!isMatch) {
+    throw new DevBuildError("Current password is incorrect", StatusCodes.UNAUTHORIZED);
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+  await prisma.users.update({
+    where: { id: userId },
+    data: { password: hashedPassword },
+  });
+};
+
 export const AuthService = {
   login,
   sendForgotPasswordOtp,
   verifyForgotPasswordOtp,
   resetPassword,
+  changePassword,
 };

@@ -77,9 +77,28 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    await AuthService.changePassword(
+      prisma,
+      req.user.id,
+      currentPassword,
+      newPassword,
+    );
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Password changed successfully.",
+    });
+  } catch (error) {
+    return handleError(res, error);
+  }
+};
+
 export const AuthController = {
   login,
   sendForgotPasswordOtp,
   verifyForgotPasswordOtp,
   resetPassword,
+  changePassword,
 };

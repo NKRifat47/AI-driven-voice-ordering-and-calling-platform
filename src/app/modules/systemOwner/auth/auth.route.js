@@ -31,4 +31,11 @@ router.post(
   AuthController.resetPassword,
 );
 
+router.post(
+  "/change-password",
+  checkAuthMiddleware("SYSTEM_OWNER"),
+  validateRequest(AuthValidation.changePasswordSchema),
+  AuthController.changePassword,
+);
+
 export const AuthRouter = router;
