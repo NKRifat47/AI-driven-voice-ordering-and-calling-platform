@@ -137,11 +137,17 @@ model user_business {
 model plans {
   id            String    @id @default(uuid())
   name          plan_type
-  price         Float
+  priceMonthly         Float
+  priceYearly          Float
+  stripeMonthlyPriceId String?
+  stripeYearlyPriceId  String?
   call_limit    Int
   message_limit Int
 
+  features      String[] @default([])
+
   subscriptions subscriptions[]
+  
 }
 
 model subscriptions {
