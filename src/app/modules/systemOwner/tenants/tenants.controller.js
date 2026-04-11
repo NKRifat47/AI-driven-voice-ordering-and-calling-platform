@@ -30,6 +30,52 @@ const getAllTenants = async (req, res) => {
   }
 };
 
+const getTenantById = async (req, res) => {
+  try {
+    const result = await TenantsService.getTenantByIdFromDB(req.params.id);
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Tenant fetched successfully",
+      data: result,
+    });
+  } catch (error) {
+    return handleError(res, error);
+  }
+};
+
+const updateTenant = async (req, res) => {
+  try {
+    const result = await TenantsService.updateTenantInDB(
+      req.params.id,
+      req.body,
+    );
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Tenant updated successfully",
+      data: result,
+    });
+  } catch (error) {
+    return handleError(res, error);
+  }
+};
+
+const deleteTenant = async (req, res) => {
+  try {
+    const result = await TenantsService.deleteTenantFromDB(req.params.id);
+
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Tenant deleted successfully",
+      data: result,
+    });
+  } catch (error) {
+    return handleError(res, error);
+  }
+};
+
 export const TenantsController = {
   getAllTenants,
+  getTenantById,
+  updateTenant,
+  deleteTenant,
 };
