@@ -13,6 +13,13 @@ router.get(
   TenantsController.getAllTenants,
 );
 
+router.post(
+  "/",
+  checkAuthMiddleware(Role.SYSTEM_OWNER),
+  validateRequest(TenantsValidation.createTenantSchema),
+  TenantsController.createTenant,
+);
+
 router.get(
   "/:id",
   checkAuthMiddleware(Role.SYSTEM_OWNER),

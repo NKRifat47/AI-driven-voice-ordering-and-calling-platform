@@ -30,6 +30,19 @@ const getAllTenants = async (req, res) => {
   }
 };
 
+const createTenant = async (req, res) => {
+  try {
+    const result = await TenantsService.createTenantInDB(req.body);
+    return res.status(StatusCodes.CREATED).json({
+      success: true,
+      message: "Tenant created successfully",
+      data: result,
+    });
+  } catch (error) {
+    return handleError(res, error);
+  }
+};
+
 const getTenantById = async (req, res) => {
   try {
     const result = await TenantsService.getTenantByIdFromDB(req.params.id);
@@ -75,6 +88,7 @@ const deleteTenant = async (req, res) => {
 
 export const TenantsController = {
   getAllTenants,
+  createTenant,
   getTenantById,
   updateTenant,
   deleteTenant,
