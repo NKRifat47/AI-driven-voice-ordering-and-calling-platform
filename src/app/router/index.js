@@ -5,6 +5,7 @@ import { TenantsRouter as SystemOwnerTenantsRouter } from "../modules/systemOwne
 import { SubscriptionBillingRouter } from "../modules/systemOwner/subscription_billing/subscription_billing.route.js";
 import { SettingsRouter } from "../modules/systemOwner/settings/settings.route.js";
 import { AuthRouter as BusinessOwnerAuthRouter } from "../modules/businessowner/auth/auth.route.js";
+import { SettingsRouter as BusinessOwnerSettingsRouter } from "../modules/businessowner/settings/settings.route.js";
 
 export const router = Router();
 const moduleRoutes = [
@@ -35,6 +36,10 @@ const moduleRoutes = [
   {
     path: "/business-owner/auth",
     route: BusinessOwnerAuthRouter,
+  },
+  {
+    path: "/business-owner/settings",
+    route: BusinessOwnerSettingsRouter,
   },
 ];
 
