@@ -6,6 +6,7 @@ import { SubscriptionBillingRouter } from "../modules/systemOwner/subscription_b
 import { SettingsRouter } from "../modules/systemOwner/settings/settings.route.js";
 import { AuthRouter as BusinessOwnerAuthRouter } from "../modules/businessowner/auth/auth.route.js";
 import { SettingsRouter as BusinessOwnerSettingsRouter } from "../modules/businessowner/settings/settings.route.js";
+import { SubscriptionRouter as BusinessOwnerSubscriptionRouter } from "../modules/businessowner/subscription/subscription.route.js";
 
 export const router = Router();
 const moduleRoutes = [
@@ -33,6 +34,8 @@ const moduleRoutes = [
     path: "/system-owner/settings",
     route: SettingsRouter,
   },
+
+  // Business Owner Routes
   {
     path: "/business-owner/auth",
     route: BusinessOwnerAuthRouter,
@@ -40,6 +43,10 @@ const moduleRoutes = [
   {
     path: "/business-owner/settings",
     route: BusinessOwnerSettingsRouter,
+  },
+  {
+    path: "/business-owner/subscription",
+    route: BusinessOwnerSubscriptionRouter,
   },
 ];
 
