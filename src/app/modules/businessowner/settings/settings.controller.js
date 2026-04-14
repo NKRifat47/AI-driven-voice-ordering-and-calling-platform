@@ -73,7 +73,97 @@ const getProfile = async (req, res) => {
   }
 };
 
+const getContactInfo = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const result = await SettingsService.getContactInfoFromDB(userId);
+
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Contact information retrieved successfully",
+      data: result,
+    });
+  } catch (error) {
+    return handleError(res, error);
+  }
+};
+
+const updatePhone = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { phone } = req.body;
+
+    const result = await SettingsService.updatePhoneInDB(userId, phone);
+
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Phone number updated successfully",
+      data: {
+        id: result.id,
+        phone: result.phone,
+      },
+    });
+  } catch (error) {
+    return handleError(res, error);
+  }
+};
+
+const getBusinessDetails = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const result = await SettingsService.getBusinessDetailsFromDB(userId);
+
+    if (!result) {
+      throw new DevBuildError("Business details not found", StatusCodes.NOT_FOUND);
+    }
+
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Business details retrieved successfully",
+      data: result,
+    });
+  } catch (error) {
+    return handleError(res, error);
+  }
+};
+
+const updateBusinessDetails = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const normalizedBody = {};
+    for (const key in req.body) {
+      normalizedBody[key.trim()] = req.body[key];
+    }
+
+    const { name, address } = normalizedBody;
+    const updateData = {};
+    if (name) updateData.name = name;
+    if (address) updateData.address = address;
+
+    if (Object.keys(updateData).length === 0) {
+      throw new DevBuildError(
+        "No data provided to update",
+        StatusCodes.BAD_REQUEST,
+      );
+    }
+
+    await SettingsService.updateBusinessDetailsInDB(userId, updateData);
+
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Business details updated successfully",
+    });
+  } catch (error) {
+    return handleError(res, error);
+  }
+};
+
 export const SettingsController = {
   updateProfile,
   getProfile,
+  getContactInfo,
+  updatePhone,
+  getBusinessDetails,
+  updateBusinessDetails,
 };

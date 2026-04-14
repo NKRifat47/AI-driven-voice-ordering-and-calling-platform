@@ -22,4 +22,30 @@ router.get(
   SettingsController.getProfile,
 );
 
+router.get(
+  "/contact-info",
+  checkAuthMiddleware("BUSINESS_OWNER"),
+  SettingsController.getContactInfo,
+);
+
+router.patch(
+  "/update-phone",
+  checkAuthMiddleware("BUSINESS_OWNER"),
+  validateRequest(SettingsValidation.updatePhoneSchema),
+  SettingsController.updatePhone,
+);
+
+router.get(
+  "/business-info",
+  checkAuthMiddleware("BUSINESS_OWNER"),
+  SettingsController.getBusinessDetails,
+);
+
+router.patch(
+  "/update-business-info",
+  checkAuthMiddleware("BUSINESS_OWNER"),
+  validateRequest(SettingsValidation.updateBusinessSchema),
+  SettingsController.updateBusinessDetails,
+);
+
 export const SettingsRouter = router;
