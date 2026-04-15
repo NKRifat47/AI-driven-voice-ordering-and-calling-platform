@@ -50,9 +50,9 @@ const getBillingHistory = async (req, res) => {
     const userId = req.user.id;
     const result = await SubscriptionService.getBillingHistoryFromDB(userId);
 
-    // Format the response to exactly match the frontend needs if necessary, 
+    // Format the response to exactly match the frontend needs if necessary,
     // but returning the raw invoices with nested plan data is usually best practice
-    
+
     return res.status(StatusCodes.OK).json({
       success: true,
       message: "Billing history retrieved successfully",
