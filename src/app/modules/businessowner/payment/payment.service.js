@@ -106,7 +106,7 @@ const processStripeWebhook = async (event) => {
         data: {
           business_id: businessId,
           subscription_id: newSubscription.id,
-          invoice_no: `INV-${Date.now()}`,
+          invoice_no: session.invoice || `INV-${Date.now()}`,
           amount: amount,
           status: 'paid', // Mark as paid
           billing_cycle: billingCycle,
