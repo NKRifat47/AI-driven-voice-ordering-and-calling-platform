@@ -34,7 +34,7 @@ const createStripeCheckoutSession = async (user, planId, billingCycle) => {
   // Frontend Success/Cancel URLs
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
   const successUrl = `${frontendUrl}/dashboard/payment-success?session_id={CHECKOUT_SESSION_ID}`;
-  const cancelUrl = `${frontendUrl}/dashboard/subscription`; // User cancels, takes them back to plans
+  const cancelUrl = `${frontendUrl}/dashboard/subscription`; 
 
   // Create checkout session
   const session = await stripe.checkout.sessions.create({
@@ -115,11 +115,10 @@ const processStripeWebhook = async (event) => {
     }
   }
 
-  // Handle successful recurring payments if needed
+ 
   if (event.type === 'invoice.payment_succeeded') {
     const invoice = event.data.object;
-    // Here we could find the subscription and extend its end date, etc.
-    // For now we only handle checkout.session.completed as MVP
+
   }
 };
 
