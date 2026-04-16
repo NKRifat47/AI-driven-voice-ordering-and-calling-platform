@@ -19,7 +19,7 @@ const handleError = (res, error) => {
 const getAllTenants = async (req, res) => {
   try {
     const result = await TenantsService.getAllTenantsFromDB();
-    
+
     return res.status(StatusCodes.OK).json({
       success: true,
       message: "Tenants fetched successfully",

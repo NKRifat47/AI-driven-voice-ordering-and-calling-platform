@@ -16,6 +16,8 @@ const moduleRoutes = [
     route: OtpRouter,
   },
 
+  // System Owner Routes
+
   {
     path: "/system-owner/auth",
     route: SystemOwnerAuthRouter,

@@ -114,7 +114,10 @@ const getBusinessDetails = async (req, res) => {
     const result = await SettingsService.getBusinessDetailsFromDB(userId);
 
     if (!result) {
-      throw new DevBuildError("Business details not found", StatusCodes.NOT_FOUND);
+      throw new DevBuildError(
+        "Business details not found",
+        StatusCodes.NOT_FOUND,
+      );
     }
 
     return res.status(StatusCodes.OK).json({

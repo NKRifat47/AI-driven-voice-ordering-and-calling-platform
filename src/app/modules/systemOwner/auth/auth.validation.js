@@ -31,7 +31,9 @@ const resetPasswordSchema = z.object({
 const changePasswordSchema = z.object({
   body: z
     .object({
-      currentPassword: z.string().min(1, { message: "Current password is required" }),
+      currentPassword: z
+        .string()
+        .min(1, { message: "Current password is required" }),
       newPassword: z
         .string()
         .min(6, { message: "New password must be at least 6 characters" }),

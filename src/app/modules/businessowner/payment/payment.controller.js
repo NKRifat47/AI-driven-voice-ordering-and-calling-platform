@@ -22,16 +22,26 @@ const handleError = (res, error) => {
 const createCheckoutSession = async (req, res) => {
   try {
     const { planId, billingCycle } = req.body;
-    
+
     if (!planId || !billingCycle) {
-      throw new DevBuildError("Plan ID and Billing Cycle are required", StatusCodes.BAD_REQUEST);
-    }
-    
-    if (!["monthly", "yearly"].includes(billingCycle)) {
-      throw new DevBuildError("Invalid billing cycle. Must be 'monthly' or 'yearly'", StatusCodes.BAD_REQUEST);
+      throw new DevBuildError(
+        "Plan ID and Billing Cycle are required",
+        StatusCodes.BAD_REQUEST,
+      );
     }
 
-    const { url } = await PaymentService.createStripeCheckoutSession(req.user, planId, billingCycle);
+    if (!["monthly", "yearly"].includes(billingCycle)) {
+      throw new DevBuildError(
+        "Invalid billing cycle. Must be 'monthly' or 'yearly'",
+        StatusCodes.BAD_REQUEST,
+      );
+    }
+
+    const { url } = await PaymentService.createStripeCheckoutSession(
+      req.user,
+      planId,
+      billingCycle,
+    );
 
     return res.status(StatusCodes.OK).json({
       success: true,
@@ -52,7 +62,9 @@ const handleWebhook = async (req, res) => {
   try {
     // We expect req.rawBody to be populated by the verify hook in express.json()
     if (!req.rawBody) {
-      throw new Error("Raw body is missing! Please configure express.json verify hook in app.js.");
+      throw new Error(
+        "Raw body is missing! Please configure express.json verify hook in app.js.",
+      );
     }
     event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
   } catch (err) {
@@ -63,14 +75,16 @@ const handleWebhook = async (req, res) => {
   try {
     // Pass the verified event to our service logic
     await PaymentService.processStripeWebhook(event);
-    
+
     // Return a 200 response to acknowledge receipt of the event
     res.status(200).json({ received: true });
   } catch (error) {
     console.error(`Webhook Processing Error:`, error);
-    // Returning 200 even on processing errors so Stripe doesn't repeatedly retry 
+    // Returning 200 even on processing errors so Stripe doesn't repeatedly retry
     // unless we want it to retry. For MVP returning 200 is fine.
-    res.status(200).json({ received: true, error: "Processing failed but received" });
+    res
+      .status(200)
+      .json({ received: true, error: "Processing failed but received" });
   }
 };
 

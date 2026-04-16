@@ -32,7 +32,8 @@ const getAllPlans = async (req, res) => {
 
 const getDashboardData = async (req, res) => {
   try {
-    const result = await SubscriptionBillingService.getSubscriptionDashboardDataFromDB();
+    const result =
+      await SubscriptionBillingService.getSubscriptionDashboardDataFromDB();
     return res.status(StatusCodes.OK).json({
       success: true,
       message: "Dashboard data fetched successfully",

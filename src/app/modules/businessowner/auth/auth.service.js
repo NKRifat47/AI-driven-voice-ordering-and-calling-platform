@@ -125,7 +125,13 @@ const refreshAccessToken = async (prisma, token) => {
 
   const user = await prisma.users.findUnique({
     where: { id: decoded.id },
-    select: { id: true, email: true, role: true, is_verified: true, status: true },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      is_verified: true,
+      status: true,
+    },
   });
 
   if (!user) {
@@ -137,7 +143,10 @@ const refreshAccessToken = async (prisma, token) => {
   }
 
   if (user.status !== "active") {
-    throw new DevBuildError("Your account is not active", StatusCodes.FORBIDDEN);
+    throw new DevBuildError(
+      "Your account is not active",
+      StatusCodes.FORBIDDEN,
+    );
   }
 
   // Generate a fresh access token
@@ -167,11 +176,15 @@ const sendForgotPasswordOtp = async (prisma, email) => {
 };
 
 const verifyForgotPasswordOtp = async (prisma, email, otp) => {
-  const resetToken = await OtpService.verifyForgotPasswordOtp(prisma, email, otp);
+  const resetToken = await OtpService.verifyForgotPasswordOtp(
+    prisma,
+    email,
+    otp,
+  );
 
   // Decode token to get user id for Redis key
   const decoded = jwt.decode(resetToken);
-  
+
   const resetRedisKey = `${RESET_TOKEN_KEY_PREFIX}:${decoded.id}`;
   await redisClient.set(resetRedisKey, resetToken, {
     EX: RESET_TOKEN_EXPIRATION,
